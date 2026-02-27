@@ -104,7 +104,7 @@
   }
 
   .logo-img {
-    height: 46px;
+    height: 58px;
     width: auto;
     display: block;
     object-fit: contain;
@@ -207,7 +207,7 @@
     position: fixed;
     inset: 0;
     background: #1A1714;
-    z-index: 999;
+    z-index: 1001;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -2285,9 +2285,12 @@
 
   @media (max-width: 900px) {
     .events-grid { grid-template-columns: 1fr 1fr; }
+    .mes-events-grid { grid-template-columns: 1fr 1fr; }
+    .mes-events-toolbar { flex-wrap: wrap; gap: 8px; }
   }
   @media (max-width: 580px) {
     .events-grid { grid-template-columns: 1fr; }
+    .mes-events-grid { grid-template-columns: 1fr; }
   }
 
   /* ===================== NAV PROFILE PILL ===================== */
@@ -5160,8 +5163,13 @@
   const mobileMenu = document.getElementById('mobileMenu');
   const closeMenu = document.getElementById('closeMenu');
 
-  hamburger.addEventListener('click', () => { mobileMenu.classList.add('open'); document.body.style.overflow = 'hidden'; });
-  closeMenu.addEventListener('click', () => { mobileMenu.classList.remove('open'); document.body.style.overflow = ''; });
+  function _openMobileMenu()  { mobileMenu.classList.add('open');    document.body.style.overflow = 'hidden'; }
+  function _closeMobileMenu() { mobileMenu.classList.remove('open'); document.body.style.overflow = ''; }
+  hamburger.addEventListener('click',    _openMobileMenu)
+  hamburger.addEventListener('touchend', e => { e.preventDefault(); _openMobileMenu(); })
+  closeMenu.addEventListener('click',    _closeMobileMenu)
+  closeMenu.addEventListener('touchend', e => { e.preventDefault(); _closeMobileMenu(); })
+  mobileMenu.addEventListener('click',   e => { if (e.target === mobileMenu) _closeMobileMenu(); })
 
   // ---- Fade up on scroll ----
   const fadeObserver = new IntersectionObserver((entries) => {
@@ -5480,6 +5488,16 @@
   }
 
   // ---- Générer un visuel Canvas pour le partage ----
+  function _loadImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => resolve(img)
+      img.onerror = reject
+      img.src = url
+    })
+  }
+
   function _roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath()
     ctx.moveTo(x + r, y)
@@ -5494,114 +5512,132 @@
     ctx.closePath()
   }
 
-  function generateEventCanvas(ev) {
+  async function generateEventCanvas(ev) {
     const W = 1080, H = 1080
     const canvas = document.createElement('canvas')
     canvas.width = W; canvas.height = H
     const ctx = canvas.getContext('2d')
 
-    // ── Fond sombre ──
-    ctx.fillStyle = '#111418'
+    // ── Fond crème ──
+    ctx.fillStyle = '#F5F0E8'
     ctx.fillRect(0, 0, W, H)
 
-    // ── Tache lumineuse teal en haut à droite ──
-    const glow = ctx.createRadialGradient(W, 0, 0, W, 0, 600)
-    glow.addColorStop(0, 'rgba(52,145,136,0.45)')
-    glow.addColorStop(1, 'rgba(52,145,136,0)')
-    ctx.fillStyle = glow
-    ctx.fillRect(0, 0, W, H)
+    // Dimensions carte
+    const CX = 60, CY = 60, CW = 960, CH = 960, R = 20
 
-    // ── Tache subtile en bas à gauche ──
-    const glow2 = ctx.createRadialGradient(0, H, 0, 0, H, 400)
-    glow2.addColorStop(0, 'rgba(192,104,48,0.20)')
-    glow2.addColorStop(1, 'rgba(192,104,48,0)')
-    ctx.fillStyle = glow2
-    ctx.fillRect(0, 0, W, H)
-
-    // ── Barre teal en haut ──
-    const topBar = ctx.createLinearGradient(0, 0, W, 0)
-    topBar.addColorStop(0, '#349188')
-    topBar.addColorStop(1, '#26706A')
-    ctx.fillStyle = topBar
-    ctx.fillRect(0, 0, W, 8)
-
-    // ── Logo "+1Life" haut gauche ──
-    ctx.fillStyle = 'rgba(255,255,255,0.5)'
-    ctx.font = '500 32px system-ui,sans-serif'
-    ctx.textAlign = 'left'
-    ctx.fillText('+1Life', 80, 74)
-
-    // ── Badge activité haut droite ──
-    const activite = (ev.activite || 'Sport').toUpperCase()
-    ctx.font = 'bold 28px system-ui,sans-serif'
-    const bW = ctx.measureText(activite).width + 48
-    const bX = W - bW - 80, bY = 48
-    ctx.fillStyle = '#349188'
-    _roundRect(ctx, bX, bY, bW, 52, 26); ctx.fill()
-    ctx.fillStyle = '#fff'
-    ctx.textAlign = 'left'
-    ctx.fillText(activite, bX + 24, bY + 35)
-
-    // ── Titre (centré, retour à la ligne) ──
+    // ── Ombre portée ──
+    ctx.save()
+    ctx.shadowColor = 'rgba(0,0,0,0.14)'
+    ctx.shadowBlur = 44
+    ctx.shadowOffsetY = 10
     ctx.fillStyle = '#FFFFFF'
-    ctx.font = 'bold 96px system-ui,sans-serif'
-    ctx.textAlign = 'center'
+    _roundRect(ctx, CX, CY, CW, CH, R); ctx.fill()
+    ctx.restore()
+
+    // ── Clip carte ──
+    ctx.save()
+    _roundRect(ctx, CX, CY, CW, CH, R); ctx.clip()
+
+    // Banner : vraie photo du sport
+    const BH = 340
+    const imgUrl = (typeof _sportImages !== 'undefined' && _sportImages[ev.activite]) || (typeof _sportDefaultImg !== 'undefined' ? _sportDefaultImg : '')
+    if (imgUrl) {
+      try {
+        const sImg = await _loadImage(imgUrl)
+        const iA = sImg.width / sImg.height, bA = CW / BH
+        let sx, sy, sw, sh
+        if (iA > bA) { sh = sImg.height; sw = sh * bA; sy = 0; sx = (sImg.width - sw) / 2 }
+        else { sw = sImg.width; sh = sw / bA; sx = 0; sy = (sImg.height - sh) / 2 }
+        ctx.drawImage(sImg, sx, sy, sw, sh, CX, CY, CW, BH)
+      } catch (_) {
+        const g = ctx.createLinearGradient(CX, CY, CX + CW, CY + BH)
+        g.addColorStop(0, '#3BA89F'); g.addColorStop(1, '#1E5C58')
+        ctx.fillStyle = g; ctx.fillRect(CX, CY, CW, BH)
+      }
+    } else {
+      const g = ctx.createLinearGradient(CX, CY, CX + CW, CY + BH)
+      g.addColorStop(0, '#3BA89F'); g.addColorStop(1, '#1E5C58')
+      ctx.fillStyle = g; ctx.fillRect(CX, CY, CW, BH)
+    }
+
+    // Overlay sombre (comme .event-item-banner::after)
+    const ovGrad = ctx.createLinearGradient(0, CY, 0, CY + BH)
+    ovGrad.addColorStop(0, 'rgba(0,0,0,0.15)')
+    ovGrad.addColorStop(1, 'rgba(0,0,0,0.60)')
+    ctx.fillStyle = ovGrad; ctx.fillRect(CX, CY, CW, BH)
+
+    // Tag activité bas-gauche banner
+    const activite = ev.activite || 'Sport'
+    ctx.font = '600 30px system-ui,-apple-system,sans-serif'
+    const tPad = 22, tH = 50, tW = ctx.measureText(activite).width + tPad * 2
+    const tX = CX + 36, tY = CY + BH - tH - 22
+    ctx.fillStyle = 'rgba(0,0,0,0.55)'
+    _roundRect(ctx, tX, tY, tW, tH, 25); ctx.fill()
+    ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'left'
+    ctx.fillText(activite, tX + tPad, tY + 33)
+
+    ctx.restore()
+
+    // ── Contenu ──
+    const PX = CX + 48, PW = CW - 96
+    const titleStartY = CY + BH + 62
+
+    // Titre uppercase bold (comme .event-item-title)
+    ctx.fillStyle = '#2A1808'
+    ctx.font = '800 62px system-ui,-apple-system,sans-serif'
+    ctx.textAlign = 'left'
     const words = (ev.titre || '').split(' ')
     const lines = []; let line = ''
     for (const wd of words) {
       const test = line ? line + ' ' + wd : wd
-      if (ctx.measureText(test).width > W - 160 && line) { lines.push(line); line = wd }
+      if (ctx.measureText(test).width > PW && line) { lines.push(line); line = wd }
       else line = test
     }
     if (line) lines.push(line)
-    const lh = 112
-    const titleY = 480 - (lines.length * lh) / 2
-    lines.forEach((l, i) => ctx.fillText(l, W / 2, titleY + i * lh))
+    const titleLH = 74
+    lines.slice(0, 3).forEach((l, i) => ctx.fillText(l.toUpperCase(), PX, titleStartY + i * titleLH))
 
-    // ── Séparateur ──
-    const sepY = titleY + lines.length * lh + 48
-    ctx.strokeStyle = 'rgba(52,145,136,0.5)'
-    ctx.lineWidth = 2
-    ctx.beginPath(); ctx.moveTo(80, sepY); ctx.lineTo(W - 80, sepY); ctx.stroke()
-
-    // ── Date + Lieu ──
-    ctx.font = '38px system-ui,sans-serif'
-    ctx.textAlign = 'left'
-    const infoY = sepY + 58
+    // Meta date + lieu (comme .event-item-meta)
+    const metaY = titleStartY + Math.min(lines.length, 3) * titleLH + 48
+    ctx.font = '36px system-ui,-apple-system,sans-serif'
+    let off = 0
     if (ev.date_heure) {
-      const ds = new Date(ev.date_heure).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' })
-      ctx.fillStyle = '#349188'; ctx.fillText('▸', 80, infoY)
-      ctx.fillStyle = 'rgba(255,255,255,0.82)'; ctx.fillText(ds, 116, infoY)
+      const ds = new Date(ev.date_heure).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+      ctx.fillStyle = '#C06830'; ctx.fillText('■', PX, metaY + off)
+      ctx.fillStyle = '#7A6050'; ctx.fillText(ds, PX + 46, metaY + off)
+      off += 54
     }
     const lieu = ev.ville || ev.lieu || ''
     if (lieu) {
-      ctx.fillStyle = '#349188'; ctx.fillText('▸', 80, infoY + 60)
-      ctx.fillStyle = 'rgba(255,255,255,0.82)'; ctx.fillText(lieu, 116, infoY + 60)
+      ctx.fillStyle = '#C06830'; ctx.fillText('■', PX, metaY + off)
+      ctx.fillStyle = '#7A6050'; ctx.fillText(lieu, PX + 46, metaY + off)
     }
 
-    // ── Barre basse ──
-    ctx.fillStyle = 'rgba(0,0,0,0.4)'
-    ctx.fillRect(0, H - 100, W, 100)
-    ctx.fillStyle = topBar
-    ctx.fillRect(0, H - 4, W, 4)
-    ctx.fillStyle = 'rgba(255,255,255,0.85)'
-    ctx.font = 'bold 36px system-ui,sans-serif'
+    // ── Séparateur ──
+    const divY = CY + CH - 136
+    ctx.strokeStyle = 'rgba(42,24,8,0.08)'
+    ctx.lineWidth = 1.5
+    ctx.beginPath(); ctx.moveTo(PX, divY); ctx.lineTo(CX + CW - 48, divY); ctx.stroke()
+
+    // ── Footer +1Life ──
+    ctx.fillStyle = '#349188'
+    ctx.font = '700 50px system-ui,-apple-system,sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText('Rejoins cet événement sur +1Life', W / 2, H - 38)
-    ctx.fillStyle = 'rgba(52,145,136,0.9)'
-    ctx.font = '26px system-ui,sans-serif'
-    ctx.fillText('plusonelife.vercel.app', W / 2, H - 10)
+    ctx.fillText('+1Life', W / 2, divY + 62)
+    ctx.fillStyle = '#7A6050'
+    ctx.font = '26px system-ui,-apple-system,sans-serif'
+    ctx.fillText('Rejoins cet événement', W / 2, divY + 100)
 
     return canvas
   }
 
   // ---- Modal de partage avec visuel ----
-  function shareEvent(e, id) {
+  async function shareEvent(e, id) {
     e.stopPropagation()
     const ev = _repeatCache[id]
     if (!ev) return
 
-    const canvas = generateEventCanvas(ev)
+    const canvas = await generateEventCanvas(ev)
     const imgSrc = canvas.toDataURL('image/png')
     const titre = ev.titre || ''
     const lieu = ev.ville || ev.lieu || ''
