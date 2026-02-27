@@ -5922,27 +5922,32 @@
   supabase.auth.onAuthStateChange(async (event, session) => {
     _currentUserId = session?.user?.id || null
     updateNavUI(session)
-    if (event === 'SIGNED_IN') {
+
+    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+      // Charger les events immédiatement, sans attendre les opérations de profil
+      loadHomeEvents()
+      loadExplorer()
+
+      if (!session?.user) return
       const user = session.user
-      // Récupérer le profil en attente (créé via inscription email avant confirmation)
+
+      // Opérations de profil en arrière-plan (ne bloquent pas l'affichage)
       const pendingKey = 'pendingProfile_' + user.id
       const pending = localStorage.getItem(pendingKey)
       if (pending) {
-        try {
-          await _upsertFullProfile(user.id, JSON.parse(pending))
-          localStorage.removeItem(pendingKey)
-        } catch(e) { console.warn('Pending profile restore error:', e) }
+        _upsertFullProfile(user.id, JSON.parse(pending))
+          .then(() => localStorage.removeItem(pendingKey))
+          .catch(e => console.warn('Pending profile restore error:', e))
       } else {
-        await upsertProfile(user)
-        // Vérifier si le profil est complet (Google OAuth ne fournit pas type/ville/date)
-        const { data: prof } = await supabase.from('profiles').select('type,ville,date_naissance').eq('id', user.id).single()
-        if (!prof?.type) {
-          openModal('modalCompleteProfile')
-        }
+        upsertProfile(user).then(async () => {
+          try {
+            const { data: prof } = await supabase.from('profiles').select('type').eq('id', user.id).single()
+            if (!prof?.type) openModal('modalCompleteProfile')
+          } catch(e) { /* profil déjà complet ou erreur non critique */ }
+        })
       }
-      loadHomeEvents()
-      loadExplorer()
     }
+
     if (event === 'SIGNED_OUT') { showView('home'); loadHomeEvents() }
   })
 
