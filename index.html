@@ -3979,15 +3979,15 @@
 
 <!-- ===================== MODAL COMPLÉTION PROFIL (Google) ===================== -->
 <div class="modal-overlay" id="modalCompleteProfile">
-  <div class="modal-box" style="max-width:440px;">
-    <div class="modal-header">
+  <div class="modal-box" style="max-width:460px;padding:32px;">
+    <div class="modal-header" style="margin-bottom:8px;">
       <div class="modal-title">Complète ton profil</div>
     </div>
-    <p style="font-size:14px;color:var(--grey2);margin-bottom:20px;">Pour profiter de +1Life, dis-nous un peu plus sur toi&nbsp;👋</p>
+    <p style="font-size:14px;color:var(--grey2);margin-bottom:28px;line-height:1.5;">Pour profiter de +1Life, dis-nous un peu plus sur toi&nbsp;👋</p>
 
     <!-- Type de profil -->
-    <p style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--grey2);">Je suis…</p>
-    <div class="profile-cards" id="cpProfileCards">
+    <p style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--grey2);text-transform:uppercase;letter-spacing:0.5px;">Je suis…</p>
+    <div class="profile-cards" id="cpProfileCards" style="gap:10px;margin-bottom:24px;">
       <div class="profile-card selected" data-profile="particulier" onclick="cpSelectProfile(this)">
         <span class="pc-icon">🏃</span>
         <div class="pc-name">Particulier</div>
@@ -4002,20 +4002,20 @@
       </div>
     </div>
 
-    <div class="form-row" style="margin-top:16px;">
-      <div class="form-group">
+    <div class="form-row" style="gap:14px;margin-bottom:8px;">
+      <div class="form-group" style="margin-bottom:0;">
         <label class="form-label">Date de naissance</label>
         <input type="date" class="form-input" id="cpDate">
       </div>
-      <div class="form-group">
+      <div class="form-group" style="margin-bottom:0;">
         <label class="form-label">Ville</label>
         <input type="text" class="form-input" id="cpVille" placeholder="Paris">
       </div>
     </div>
 
-    <div id="cpErr" style="color:#E53935;font-size:13px;margin-top:8px;display:none;"></div>
-    <div class="modal-footer" style="margin-top:20px;">
-      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="submitCompleteProfile()">
+    <div id="cpErr" style="color:#E53935;font-size:13px;margin-top:10px;display:none;"></div>
+    <div class="modal-footer" style="margin-top:28px;padding-top:0;border:none;">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;height:50px;font-size:15px;" onclick="submitCompleteProfile()">
         Valider <i class="fa-solid fa-check"></i>
       </button>
     </div>
