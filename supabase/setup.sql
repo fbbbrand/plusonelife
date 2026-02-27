@@ -16,28 +16,12 @@ CREATE TABLE IF NOT EXISTS reviews (
   UNIQUE(reviewer_id, reviewed_id)  -- un seul avis par paire
 );
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
-DO $$ DECLARE r RECORD; BEGIN FOR r IN SELECT schemaname, tablename, policyname FROM pg_policies WHERE tablename IN ('reviews','banned_users') LOOP EXECUTE format('DROP POLICY IF EXISTS %I ON %I.%I', r.policyname, r.schemaname, r.tablename); END LOOP; END $$;
 CREATE POLICY "Reviews visible to all"           ON reviews FOR SELECT USING (true);
 CREATE POLICY "Auth users can post reviews"      ON reviews FOR INSERT WITH CHECK (auth.uid() = reviewer_id AND auth.uid() != reviewed_id);
 CREATE POLICY "Auth users can update own review" ON reviews FOR UPDATE USING (auth.uid() = reviewer_id);
 CREATE POLICY "Auth users can delete own review" ON reviews FOR DELETE USING (auth.uid() = reviewer_id);
 
--- 3. Table banned_users (bannissements admin)
-CREATE TABLE IF NOT EXISTS banned_users (
-  user_id   UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  raison    TEXT,
-  banned_at TIMESTAMPTZ DEFAULT NOW(),
-  banned_by UUID REFERENCES auth.users(id)
-);
-ALTER TABLE banned_users ENABLE ROW LEVEL SECURITY;
--- Un utilisateur peut vérifier son propre statut de ban
-CREATE POLICY "Users can check own ban" ON banned_users FOR SELECT USING (auth.uid() = user_id);
--- L'admin (app_metadata.role = 'admin') gère les bans
-CREATE POLICY "Admin can view banned"   ON banned_users FOR SELECT USING ((auth.jwt()->'app_metadata'->>'role') = 'admin');
-CREATE POLICY "Admin can ban users"     ON banned_users FOR INSERT WITH CHECK ((auth.jwt()->'app_metadata'->>'role') = 'admin');
-CREATE POLICY "Admin can unban users"   ON banned_users FOR DELETE USING ((auth.jwt()->'app_metadata'->>'role') = 'admin');
-
--- 4. Table notification_log (éviter les doublons d'emails)
+-- 3. Table notification_log (éviter les doublons d'emails)
 CREATE TABLE IF NOT EXISTS notification_log (
   id         UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   event_id   UUID,
