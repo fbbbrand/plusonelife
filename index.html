@@ -359,10 +359,21 @@
     background: var(--dark2);
     border: 1px solid rgba(255,255,255,0.09);
     border-radius: var(--radius);
-    padding: 20px;
+    padding: 0;
     box-shadow: var(--shadow);
     transform: rotate(-2deg);
     transition: transform 0.3s;
+    overflow: hidden;
+  }
+  .ecp-img {
+    width: 100%;
+    height: 110px;
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .ecp-body {
+    padding: 16px 18px 18px;
   }
 
   .event-card-preview:hover { transform: rotate(0deg) scale(1.02); }
@@ -2843,6 +2854,64 @@
     border-color: rgba(255,255,255,0.2);
     color: var(--white);
   }
+
+  /* Share / Calendar icon buttons on cards */
+  .event-card-icons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .btn-icon-card {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.1);
+    color: var(--grey);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .btn-icon-card:hover { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+  /* Floating dropdown menu (share / calendar) */
+  .floating-menu {
+    position: fixed;
+    background: #FFFFFF;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+    z-index: 9998;
+    min-width: 188px;
+    overflow: hidden;
+    animation: fadeInDown 0.15s ease;
+  }
+  @keyframes fadeInDown {
+    from { opacity:0; transform:translateY(-6px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .floating-menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px;
+    cursor: pointer;
+    font-size: 13px; font-weight: 500;
+    color: var(--white);
+    border: none; background: transparent;
+    width: 100%; text-align: left;
+    transition: background 0.15s;
+  }
+  .floating-menu-item:hover { background: var(--bg); }
+  .floating-menu-item i { width: 16px; color: var(--orange); font-size: 14px; }
+
+  /* Facebook login button */
+  .btn-facebook {
+    background: #1877F2;
+    color: #fff;
+    border-color: #1877F2;
+  }
+  .btn-facebook:hover { background: #145dbf; border-color: #145dbf; }
+
   .event-actions {
     display: flex;
     align-items: center;
@@ -3102,30 +3171,36 @@
   <!-- Carte event flottante (desktop) -->
   <div class="hero-visual">
     <div class="event-card-preview fade-up">
-      <div class="ecp-tag"><i class="fa-solid fa-person-walking"></i> Marche</div>
-      <div class="ecp-title">Balade matinale — Parc</div>
-      <div class="ecp-info">
-        <span><i class="fa-regular fa-clock"></i> Demain 9h00</span>
-        <span><i class="fa-solid fa-heart"></i> Tous niveaux</span>
-      </div>
-      <div class="ecp-avatars">
-        <div class="ecp-avatar" style="font-size:14px;">🧑</div>
-        <div class="ecp-avatar" style="font-size:14px;">👩</div>
-        <div class="ecp-avatar" style="font-size:14px;">🧔</div>
-        <span class="ecp-count">+4 participants</span>
+      <div class="ecp-img" style="background-image:url('https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=500&h=220&fit=crop&auto=format&q=70')"></div>
+      <div class="ecp-body">
+        <div class="ecp-tag"><i class="fa-solid fa-person-walking"></i> Marche</div>
+        <div class="ecp-title">Balade matinale — Parc</div>
+        <div class="ecp-info">
+          <span><i class="fa-regular fa-clock"></i> Demain 9h00</span>
+          <span><i class="fa-solid fa-heart"></i> Tous niveaux</span>
+        </div>
+        <div class="ecp-avatars">
+          <div class="ecp-avatar" style="font-size:14px;">🧑</div>
+          <div class="ecp-avatar" style="font-size:14px;">👩</div>
+          <div class="ecp-avatar" style="font-size:14px;">🧔</div>
+          <span class="ecp-count">+4 participants</span>
+        </div>
       </div>
     </div>
     <div class="event-card-preview card2 fade-up">
-      <div class="ecp-tag"><i class="fa-solid fa-spa"></i> Yoga doux</div>
-      <div class="ecp-title">Séance relaxation — Salle polyvalente</div>
-      <div class="ecp-info">
-        <span><i class="fa-regular fa-clock"></i> Sam 10h00</span>
-        <span><i class="fa-solid fa-heart"></i> Tous niveaux</span>
-      </div>
-      <div class="ecp-avatars">
-        <div class="ecp-avatar" style="font-size:14px;">👵</div>
-        <div class="ecp-avatar" style="font-size:14px;">🧘</div>
-        <span class="ecp-count">+6 participants</span>
+      <div class="ecp-img" style="background-image:url('https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=500&h=220&fit=crop&auto=format&q=70')"></div>
+      <div class="ecp-body">
+        <div class="ecp-tag"><i class="fa-solid fa-spa"></i> Yoga doux</div>
+        <div class="ecp-title">Séance relaxation — Salle polyvalente</div>
+        <div class="ecp-info">
+          <span><i class="fa-regular fa-clock"></i> Sam 10h00</span>
+          <span><i class="fa-solid fa-heart"></i> Tous niveaux</span>
+        </div>
+        <div class="ecp-avatars">
+          <div class="ecp-avatar" style="font-size:14px;">👵</div>
+          <div class="ecp-avatar" style="font-size:14px;">🧘</div>
+          <span class="ecp-count">+6 participants</span>
+        </div>
       </div>
     </div>
   </div>
@@ -4514,6 +4589,10 @@
       </div>` : ''}
       <div class="event-item-footer">
         <button class="event-participant-count clickable" onclick="showEventParticipants('${esc(ev.id)}', ${esc(String(pCount))})"><i class="fa-solid fa-users"></i> ${pCount}${maxP ? ' / ' + maxP : ''} <i class="fa-solid fa-chevron-right" style="font-size:9px;opacity:0.5;margin-left:2px;"></i></button>
+        <div class="event-card-icons">
+          <button class="btn-icon-card" title="Partager" onclick="shareEvent(event,'${esc(ev.id)}')"><i class="fa-solid fa-share-nodes"></i></button>
+          ${!ev._isPast ? `<button class="btn-icon-card" title="Ajouter au calendrier" onclick="addToCalendar(event,'${esc(ev.id)}')"><i class="fa-solid fa-calendar-plus"></i></button>` : ''}
+        </div>
         ${actionBtn}
       </div>
     </div>`
@@ -5364,6 +5443,292 @@
     })
   }
 
+  // ---- Connexion Facebook ----
+  // Requis : activer le provider Facebook dans Supabase Dashboard > Auth > Providers
+  // et configurer l'App ID/Secret issus de developers.facebook.com
+  function loginWithFacebook() {
+    supabase.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: { redirectTo: window.location.href.split('#')[0] }
+    })
+  }
+
+  // ---- Floating menu (partage / calendrier) ----
+  let _activeFloatingMenu = null
+  function closeFloatingMenu() {
+    if (_activeFloatingMenu) { _activeFloatingMenu.remove(); _activeFloatingMenu = null }
+  }
+  function showFloatingMenu(anchorEl, items) {
+    closeFloatingMenu()
+    const menu = document.createElement('div')
+    menu.className = 'floating-menu'
+    items.forEach(item => {
+      const btn = document.createElement('button')
+      btn.className = 'floating-menu-item'
+      btn.innerHTML = `<i class="${item.icon}"></i> ${item.label}`
+      btn.onclick = () => { item.action(); closeFloatingMenu() }
+      menu.appendChild(btn)
+    })
+    document.body.appendChild(menu)
+    _activeFloatingMenu = menu
+    const rect = anchorEl.getBoundingClientRect()
+    const top = rect.bottom + window.scrollY + 6
+    const left = Math.min(rect.left + window.scrollX, window.innerWidth - 200)
+    menu.style.top = top + 'px'
+    menu.style.left = left + 'px'
+    setTimeout(() => document.addEventListener('click', closeFloatingMenu, { once: true }), 10)
+  }
+
+  // ---- Générer un visuel Canvas pour le partage ----
+  function _roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath()
+    ctx.moveTo(x + r, y)
+    ctx.lineTo(x + w - r, y)
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+    ctx.lineTo(x + w, y + h - r)
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+    ctx.lineTo(x + r, y + h)
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+    ctx.lineTo(x, y + r)
+    ctx.quadraticCurveTo(x, y, x + r, y)
+    ctx.closePath()
+  }
+
+  function generateEventCanvas(ev) {
+    const W = 1080, H = 1080
+    const canvas = document.createElement('canvas')
+    canvas.width = W; canvas.height = H
+    const ctx = canvas.getContext('2d')
+
+    // ── Fond sombre ──
+    ctx.fillStyle = '#111418'
+    ctx.fillRect(0, 0, W, H)
+
+    // ── Tache lumineuse teal en haut à droite ──
+    const glow = ctx.createRadialGradient(W, 0, 0, W, 0, 600)
+    glow.addColorStop(0, 'rgba(52,145,136,0.45)')
+    glow.addColorStop(1, 'rgba(52,145,136,0)')
+    ctx.fillStyle = glow
+    ctx.fillRect(0, 0, W, H)
+
+    // ── Tache subtile en bas à gauche ──
+    const glow2 = ctx.createRadialGradient(0, H, 0, 0, H, 400)
+    glow2.addColorStop(0, 'rgba(192,104,48,0.20)')
+    glow2.addColorStop(1, 'rgba(192,104,48,0)')
+    ctx.fillStyle = glow2
+    ctx.fillRect(0, 0, W, H)
+
+    // ── Barre teal en haut ──
+    const topBar = ctx.createLinearGradient(0, 0, W, 0)
+    topBar.addColorStop(0, '#349188')
+    topBar.addColorStop(1, '#26706A')
+    ctx.fillStyle = topBar
+    ctx.fillRect(0, 0, W, 8)
+
+    // ── Logo "+1Life" haut gauche ──
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'
+    ctx.font = '500 32px system-ui,sans-serif'
+    ctx.textAlign = 'left'
+    ctx.fillText('+1Life', 80, 74)
+
+    // ── Badge activité haut droite ──
+    const activite = (ev.activite || 'Sport').toUpperCase()
+    ctx.font = 'bold 28px system-ui,sans-serif'
+    const bW = ctx.measureText(activite).width + 48
+    const bX = W - bW - 80, bY = 48
+    ctx.fillStyle = '#349188'
+    _roundRect(ctx, bX, bY, bW, 52, 26); ctx.fill()
+    ctx.fillStyle = '#fff'
+    ctx.textAlign = 'left'
+    ctx.fillText(activite, bX + 24, bY + 35)
+
+    // ── Titre (centré, retour à la ligne) ──
+    ctx.fillStyle = '#FFFFFF'
+    ctx.font = 'bold 96px system-ui,sans-serif'
+    ctx.textAlign = 'center'
+    const words = (ev.titre || '').split(' ')
+    const lines = []; let line = ''
+    for (const wd of words) {
+      const test = line ? line + ' ' + wd : wd
+      if (ctx.measureText(test).width > W - 160 && line) { lines.push(line); line = wd }
+      else line = test
+    }
+    if (line) lines.push(line)
+    const lh = 112
+    const titleY = 480 - (lines.length * lh) / 2
+    lines.forEach((l, i) => ctx.fillText(l, W / 2, titleY + i * lh))
+
+    // ── Séparateur ──
+    const sepY = titleY + lines.length * lh + 48
+    ctx.strokeStyle = 'rgba(52,145,136,0.5)'
+    ctx.lineWidth = 2
+    ctx.beginPath(); ctx.moveTo(80, sepY); ctx.lineTo(W - 80, sepY); ctx.stroke()
+
+    // ── Date + Lieu ──
+    ctx.font = '38px system-ui,sans-serif'
+    ctx.textAlign = 'left'
+    const infoY = sepY + 58
+    if (ev.date_heure) {
+      const ds = new Date(ev.date_heure).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' })
+      ctx.fillStyle = '#349188'; ctx.fillText('▸', 80, infoY)
+      ctx.fillStyle = 'rgba(255,255,255,0.82)'; ctx.fillText(ds, 116, infoY)
+    }
+    const lieu = ev.ville || ev.lieu || ''
+    if (lieu) {
+      ctx.fillStyle = '#349188'; ctx.fillText('▸', 80, infoY + 60)
+      ctx.fillStyle = 'rgba(255,255,255,0.82)'; ctx.fillText(lieu, 116, infoY + 60)
+    }
+
+    // ── Barre basse ──
+    ctx.fillStyle = 'rgba(0,0,0,0.4)'
+    ctx.fillRect(0, H - 100, W, 100)
+    ctx.fillStyle = topBar
+    ctx.fillRect(0, H - 4, W, 4)
+    ctx.fillStyle = 'rgba(255,255,255,0.85)'
+    ctx.font = 'bold 36px system-ui,sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('Rejoins cet événement sur +1Life', W / 2, H - 38)
+    ctx.fillStyle = 'rgba(52,145,136,0.9)'
+    ctx.font = '26px system-ui,sans-serif'
+    ctx.fillText('plusonelife.vercel.app', W / 2, H - 10)
+
+    return canvas
+  }
+
+  // ---- Modal de partage avec visuel ----
+  function shareEvent(e, id) {
+    e.stopPropagation()
+    const ev = _repeatCache[id]
+    if (!ev) return
+
+    const canvas = generateEventCanvas(ev)
+    const imgSrc = canvas.toDataURL('image/png')
+    const titre = ev.titre || ''
+    const lieu = ev.ville || ev.lieu || ''
+    const dateStr = ev.date_heure
+      ? new Date(ev.date_heure).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' })
+      : ''
+    const text = `${titre}${dateStr ? ' — ' + dateStr : ''}${lieu ? ' à ' + lieu : ''}`
+    const url = window.location.origin + window.location.pathname
+
+    // Overlay
+    const overlay = document.createElement('div')
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;'
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove() }
+
+    // Box
+    const box = document.createElement('div')
+    box.style.cssText = 'background:#fff;border-radius:20px;padding:20px;max-width:400px;width:100%;position:relative;'
+
+    // Close
+    const close = document.createElement('button')
+    close.innerHTML = '<i class="fa-solid fa-xmark"></i>'
+    close.style.cssText = 'position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;border:1px solid rgba(0,0,0,0.1);background:transparent;cursor:pointer;font-size:14px;color:var(--grey);display:flex;align-items:center;justify-content:center;'
+    close.onclick = () => overlay.remove()
+
+    // Preview image
+    const img = document.createElement('img')
+    img.src = imgSrc
+    img.style.cssText = 'width:100%;border-radius:12px;display:block;margin-bottom:16px;'
+
+    // Bouton Télécharger + Partager image
+    const row1 = document.createElement('div')
+    row1.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;'
+
+    const dlBtn = document.createElement('button')
+    dlBtn.className = 'btn btn-outline'
+    dlBtn.style.cssText = 'flex:1;justify-content:center;gap:6px;font-size:13px;'
+    dlBtn.innerHTML = '<i class="fa-solid fa-download"></i> Télécharger'
+    dlBtn.onclick = () => {
+      const a = document.createElement('a')
+      a.href = imgSrc; a.download = titre.replace(/\s+/g,'_') + '.png'; a.click()
+    }
+
+    const shareImgBtn = document.createElement('button')
+    shareImgBtn.className = 'btn btn-primary'
+    shareImgBtn.style.cssText = 'flex:1;justify-content:center;gap:6px;font-size:13px;'
+    shareImgBtn.innerHTML = '<i class="fa-solid fa-share-nodes"></i> Partager l\'image'
+    shareImgBtn.onclick = () => {
+      canvas.toBlob(async blob => {
+        const file = new File([blob], 'event.png', { type:'image/png' })
+        if (navigator.canShare && navigator.canShare({ files:[file] })) {
+          await navigator.share({ title: titre, files:[file] })
+        } else {
+          navigator.clipboard.writeText(url)
+          showToast('✅ Lien copié — partage image non supporté sur ce navigateur')
+        }
+      }, 'image/png')
+    }
+
+    // Boutons plateformes
+    const row2 = document.createElement('div')
+    row2.style.cssText = 'display:flex;gap:8px;'
+
+    const platforms = [
+      { label:'WhatsApp', icon:'fa-brands fa-whatsapp', color:'#25D366', href: `https://wa.me/?text=${encodeURIComponent(text+'\n'+url)}` },
+      { label:'Facebook', icon:'fa-brands fa-facebook', color:'#1877F2', href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}` },
+      { label:'X',        icon:'fa-brands fa-x-twitter', color:'#000', href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}` },
+    ]
+    platforms.forEach(p => {
+      const btn = document.createElement('button')
+      btn.style.cssText = `flex:1;height:40px;border-radius:10px;border:none;background:${p.color};color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;`
+      btn.innerHTML = `<i class="${p.icon}"></i>`
+      btn.title = p.label
+      btn.onclick = () => window.open(p.href, '_blank')
+      row2.appendChild(btn)
+    })
+    const copyBtn = document.createElement('button')
+    copyBtn.style.cssText = 'flex:1;height:40px;border-radius:10px;border:1px solid rgba(0,0,0,0.12);background:transparent;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--grey2);'
+    copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i>'
+    copyBtn.title = 'Copier le lien'
+    copyBtn.onclick = () => { navigator.clipboard.writeText(url); showToast('✅ Lien copié !'); overlay.remove() }
+    row2.appendChild(copyBtn)
+
+    row1.appendChild(dlBtn); row1.appendChild(shareImgBtn)
+    box.appendChild(close); box.appendChild(img)
+    box.appendChild(row1); box.appendChild(row2)
+    overlay.appendChild(box)
+    document.body.appendChild(overlay)
+  }
+
+  // ---- Ajouter au calendrier ----
+  function addToCalendar(e, id) {
+    e.stopPropagation()
+    const ev = _repeatCache[id]
+    if (!ev || !ev.date_heure) { showToast('Pas de date définie pour cet événement'); return }
+    const titre = ev.titre || 'Événement +1Life'
+    const lieu = [ev.lieu, ev.ville].filter(Boolean).join(', ')
+    const desc = (ev.description || '') + '\n\nVia +1Life'
+    const start = new Date(ev.date_heure)
+    const end = new Date(start.getTime() + 90 * 60 * 1000)
+    const fmt = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+
+    const gcUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titre)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(desc)}&location=${encodeURIComponent(lieu)}`
+    const olUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(titre)}&startdt=${start.toISOString()}&enddt=${end.toISOString()}&body=${encodeURIComponent(desc)}&location=${encodeURIComponent(lieu)}`
+
+    function downloadIcs() {
+      const ics = [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//+1Life//FR',
+        'BEGIN:VEVENT',
+        `DTSTART:${fmt(start)}`, `DTEND:${fmt(end)}`,
+        `SUMMARY:${titre}`,
+        `DESCRIPTION:${desc.replace(/\n/g, '\\n')}`,
+        `LOCATION:${lieu}`,
+        'END:VEVENT', 'END:VCALENDAR'
+      ].join('\r\n')
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }))
+      a.download = titre.replace(/\s+/g, '_') + '.ics'
+      a.click()
+    }
+
+    showFloatingMenu(e.currentTarget, [
+      { icon: 'fa-brands fa-google', label: 'Google Agenda',    action: () => window.open(gcUrl, '_blank') },
+      { icon: 'fa-brands fa-apple',  label: 'Apple Calendar',   action: downloadIcs },
+      { icon: 'fa-solid fa-calendar',label: 'Outlook / .ics',   action: () => window.open(olUrl, '_blank') },
+    ])
+  }
+
   // ---- Déconnexion ----
   function logoutUser() {
     supabase.auth.signOut()
@@ -5654,7 +6019,7 @@
           </div>
           Valide l'event après avec une photo de groupe pour recevoir tes points de création.
         </div>
-        <button class="btn btn-primary btn-large" onclick="closeModal('modalEvent')">
+        <button class="btn btn-primary btn-large" onclick="closeModal('modalEvent'); loadHomeEvents(); loadExplorer(); if(typeof loadMesEvents==='function') loadMesEvents();">
           <i class="fa-solid fa-check"></i> Parfait !
         </button>
       </div>`
