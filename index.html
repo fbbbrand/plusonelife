@@ -3977,6 +3977,51 @@
   </div>
 </div>
 
+<!-- ===================== MODAL COMPLÉTION PROFIL (Google) ===================== -->
+<div class="modal-overlay" id="modalCompleteProfile">
+  <div class="modal-box" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">Complète ton profil</div>
+    </div>
+    <p style="font-size:14px;color:var(--grey2);margin-bottom:20px;">Pour profiter de +1Life, dis-nous un peu plus sur toi&nbsp;👋</p>
+
+    <!-- Type de profil -->
+    <p style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--grey2);">Je suis…</p>
+    <div class="profile-cards" id="cpProfileCards">
+      <div class="profile-card selected" data-profile="particulier" onclick="cpSelectProfile(this)">
+        <span class="pc-icon">🏃</span>
+        <div class="pc-name">Particulier</div>
+      </div>
+      <div class="profile-card" data-profile="association" onclick="cpSelectProfile(this)">
+        <span class="pc-icon">🤝</span>
+        <div class="pc-name">Association</div>
+      </div>
+      <div class="profile-card" data-profile="pro" onclick="cpSelectProfile(this)">
+        <span class="pc-icon">💼</span>
+        <div class="pc-name">Pro</div>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-top:16px;">
+      <div class="form-group">
+        <label class="form-label">Date de naissance</label>
+        <input type="date" class="form-input" id="cpDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ville</label>
+        <input type="text" class="form-input" id="cpVille" placeholder="Paris">
+      </div>
+    </div>
+
+    <div id="cpErr" style="color:#E53935;font-size:13px;margin-top:8px;display:none;"></div>
+    <div class="modal-footer" style="margin-top:20px;">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="submitCompleteProfile()">
+        Valider <i class="fa-solid fa-check"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ===================== MODAL CRÉATION D'ÉVÉNEMENT ===================== -->
 <div class="modal-overlay" id="modalEvent">
   <div class="modal-box wide">
@@ -4665,8 +4710,8 @@
   }
 
   function confirmDelete(eventId) {
-    // Récupérer les infos de l'event pour la notification
     const ev = _repeatCache[eventId] || _allEvents.find(e => e.id === eventId)
+    if (!ev || !ev._isCreator) return
     const overlay = document.getElementById('confirmOverlay')
     overlay.classList.add('open')
     document.getElementById('confirmOkBtn').onclick = async () => {
@@ -5844,6 +5889,35 @@
     if (error) console.warn('Profile upsert:', error.message)
   }
 
+  // ---- Complétion de profil après Google OAuth ----
+  function cpSelectProfile(el) {
+    document.querySelectorAll('#cpProfileCards .profile-card').forEach(c => c.classList.remove('selected'))
+    el.classList.add('selected')
+  }
+
+  async function submitCompleteProfile() {
+    const btn = document.querySelector('#modalCompleteProfile .btn-primary')
+    const errEl = document.getElementById('cpErr')
+    errEl.style.display = 'none'
+
+    const selected = document.querySelector('#cpProfileCards .profile-card.selected')
+    const type = selected?.dataset.profile || 'particulier'
+    const ville = document.getElementById('cpVille').value.trim()
+    const date_naissance = document.getElementById('cpDate').value
+
+    if (!date_naissance) { errEl.textContent = 'Ta date de naissance est requise.'; errEl.style.display = 'block'; return }
+
+    btn.disabled = true; btn.textContent = 'Enregistrement…'
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { btn.disabled = false; return }
+
+    const { error } = await supabase.from('profiles').update({ type, ville: ville || null, date_naissance }).eq('id', user.id)
+    btn.disabled = false; btn.innerHTML = 'Valider <i class="fa-solid fa-check"></i>'
+    if (error) { errEl.textContent = 'Erreur : ' + error.message; errEl.style.display = 'block'; return }
+    closeModal('modalCompleteProfile')
+    showToast('✅ Profil complété !')
+  }
+
   // ---- Écouter les changements d'état auth ----
   supabase.auth.onAuthStateChange(async (event, session) => {
     _currentUserId = session?.user?.id || null
@@ -5859,7 +5933,12 @@
           localStorage.removeItem(pendingKey)
         } catch(e) { console.warn('Pending profile restore error:', e) }
       } else {
-        upsertProfile(user)
+        await upsertProfile(user)
+        // Vérifier si le profil est complet (Google OAuth ne fournit pas type/ville/date)
+        const { data: prof } = await supabase.from('profiles').select('type,ville,date_naissance').eq('id', user.id).single()
+        if (!prof?.type) {
+          openModal('modalCompleteProfile')
+        }
       }
       loadHomeEvents()
       loadExplorer()
