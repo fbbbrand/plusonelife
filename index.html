@@ -2043,7 +2043,7 @@
   /* ===================== SPORTS MARQUEE ===================== */
   .sports-strip-outer {
     overflow: hidden;
-    padding: 18px 0;
+    padding: 20px 0;
     background: var(--dark);
     border-top: 1px solid rgba(26,23,20,0.06);
     border-bottom: 1px solid rgba(26,23,20,0.06);
@@ -2055,7 +2055,7 @@
     content: '';
     position: absolute;
     top: 0; bottom: 0;
-    width: 100px;
+    width: 120px;
     z-index: 2;
     pointer-events: none;
   }
@@ -2064,9 +2064,9 @@
 
   .sports-strip {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     width: max-content;
-    animation: marquee 32s linear infinite;
+    animation: marquee 40s linear infinite;
   }
 
   @keyframes marquee {
@@ -2077,18 +2077,34 @@
   .sports-strip-outer:hover .sports-strip { animation-play-state: paused; }
 
   .sport-pill {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 7px 16px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.09);
-    border-radius: 50px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--grey2);
-    white-space: nowrap;
+    position: relative;
+    width: 150px;
+    height: 96px;
+    border-radius: 12px;
+    overflow: hidden;
     flex-shrink: 0;
+    background-size: cover;
+    background-position: center;
+    cursor: default;
+  }
+  .sport-pill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.08) 60%);
+  }
+  .sport-pill span {
+    position: absolute;
+    bottom: 10px;
+    left: 0; right: 0;
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    z-index: 1;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
   }
 
   /* ===================== EVENTS PREVIEW ===================== */
@@ -3117,35 +3133,35 @@
 <!-- ===================== SPORTS MARQUEE ===================== -->
 <div class="sports-strip-outer">
   <div class="sports-strip">
-    <div class="sport-pill">🚶 Marche</div>
-    <div class="sport-pill">⛰️ Randonnée</div>
-    <div class="sport-pill">🌊 Longe Côte</div>
-    <div class="sport-pill">🎳 Pétanque</div>
-    <div class="sport-pill">🧘 Yoga</div>
-    <div class="sport-pill">🌿 Qigong</div>
-    <div class="sport-pill">🏊 Natation</div>
-    <div class="sport-pill">🚴 Vélo</div>
-    <div class="sport-pill">🏃 Running</div>
-    <div class="sport-pill">⚽ Football</div>
-    <div class="sport-pill">🎾 Tennis</div>
-    <div class="sport-pill">🏸 Badminton</div>
-    <div class="sport-pill">🧗 Escalade</div>
-    <div class="sport-pill">🏋️ Gym</div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=300&h=200&fit=crop&auto=format&q=70')"><span>Marche</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=300&h=200&fit=crop&auto=format&q=70')"><span>Randonnée</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=200&fit=crop&auto=format&q=70')"><span>Longe Côte</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?w=300&h=200&fit=crop&auto=format&q=70')"><span>Pétanque</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=300&h=200&fit=crop&auto=format&q=70')"><span>Yoga</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1545389336-cf090694435e?w=300&h=200&fit=crop&auto=format&q=70')"><span>Qigong</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1530549387789-4c1017266635?w=300&h=200&fit=crop&auto=format&q=70')"><span>Natation</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=300&h=200&fit=crop&auto=format&q=70')"><span>Vélo</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=300&h=200&fit=crop&auto=format&q=70')"><span>Running</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=300&h=200&fit=crop&auto=format&q=70')"><span>Football</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1542144612-1b1e99c5c4c5?w=300&h=200&fit=crop&auto=format&q=70')"><span>Tennis</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=300&h=200&fit=crop&auto=format&q=70')"><span>Badminton</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1522163182402-834f871fd851?w=300&h=200&fit=crop&auto=format&q=70')"><span>Escalade</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300&h=200&fit=crop&auto=format&q=70')"><span>Gym</span></div>
     <!-- répétition pour boucle infinie -->
-    <div class="sport-pill">🚶 Marche</div>
-    <div class="sport-pill">⛰️ Randonnée</div>
-    <div class="sport-pill">🌊 Longe Côte</div>
-    <div class="sport-pill">🎳 Pétanque</div>
-    <div class="sport-pill">🧘 Yoga</div>
-    <div class="sport-pill">🌿 Qigong</div>
-    <div class="sport-pill">🏊 Natation</div>
-    <div class="sport-pill">🚴 Vélo</div>
-    <div class="sport-pill">🏃 Running</div>
-    <div class="sport-pill">⚽ Football</div>
-    <div class="sport-pill">🎾 Tennis</div>
-    <div class="sport-pill">🏸 Badminton</div>
-    <div class="sport-pill">🧗 Escalade</div>
-    <div class="sport-pill">🏋️ Gym</div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=300&h=200&fit=crop&auto=format&q=70')"><span>Marche</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=300&h=200&fit=crop&auto=format&q=70')"><span>Randonnée</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=200&fit=crop&auto=format&q=70')"><span>Longe Côte</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?w=300&h=200&fit=crop&auto=format&q=70')"><span>Pétanque</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=300&h=200&fit=crop&auto=format&q=70')"><span>Yoga</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1545389336-cf090694435e?w=300&h=200&fit=crop&auto=format&q=70')"><span>Qigong</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1530549387789-4c1017266635?w=300&h=200&fit=crop&auto=format&q=70')"><span>Natation</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=300&h=200&fit=crop&auto=format&q=70')"><span>Vélo</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=300&h=200&fit=crop&auto=format&q=70')"><span>Running</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=300&h=200&fit=crop&auto=format&q=70')"><span>Football</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1542144612-1b1e99c5c4c5?w=300&h=200&fit=crop&auto=format&q=70')"><span>Tennis</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=300&h=200&fit=crop&auto=format&q=70')"><span>Badminton</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1522163182402-834f871fd851?w=300&h=200&fit=crop&auto=format&q=70')"><span>Escalade</span></div>
+    <div class="sport-pill" style="background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300&h=200&fit=crop&auto=format&q=70')"><span>Gym</span></div>
   </div>
 </div>
 
