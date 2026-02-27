@@ -3100,6 +3100,26 @@
   .points-section { background: #FFF5EC; }
   .safety-section { background: #F0F8EE !important; }
   footer { background: #EDF6FB !important; border-top: 1px solid rgba(61,181,216,0.15) !important; }
+  .admin-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;display:none;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto; }
+  .admin-overlay.open { display:flex; }
+  .admin-box { background:var(--dark2);border-radius:18px;padding:28px;width:100%;max-width:860px;margin:auto; }
+  .admin-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:24px; }
+  .admin-title { font-size:20px;font-weight:700;color:var(--white); }
+  .admin-tabs { display:flex;gap:8px;margin-bottom:20px; }
+  .admin-tab { padding:8px 18px;border-radius:20px;border:1px solid var(--dark3);background:transparent;color:var(--grey);cursor:pointer;font-size:13px;font-weight:600;transition:.2s; }
+  .admin-tab.active { background:var(--red);border-color:var(--red);color:#fff; }
+  .admin-section { display:none; }
+  .admin-section.active { display:block; }
+  .admin-row { display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--dark3); }
+  .admin-row:last-child { border-bottom:none; }
+  .admin-row-info { flex:1;min-width:0; }
+  .admin-row-name { font-weight:600;color:var(--white);font-size:14px; }
+  .admin-row-sub { font-size:12px;color:var(--grey);margin-top:2px; }
+  .btn-admin-del { padding:6px 14px;border-radius:8px;border:none;background:#ff4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer; }
+  .btn-admin-ban { padding:6px 14px;border-radius:8px;border:none;background:#ff8800;color:#fff;font-size:12px;font-weight:700;cursor:pointer; }
+  .btn-admin-unban { padding:6px 14px;border-radius:8px;border:none;background:#22aa55;color:#fff;font-size:12px;font-weight:700;cursor:pointer; }
+  .admin-empty { text-align:center;padding:32px;color:var(--grey);font-size:14px; }
+  .banned-badge { display:inline-block;background:#ff4444;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:8px; }
 </style>
 </head>
 <body>
@@ -3113,6 +3133,7 @@
     <li><a href="#explorer" onclick="event.preventDefault();showExplorer()">Voir événements</a></li>
     <li><a href="#comment" onclick="event.preventDefault();showView('home');setTimeout(()=>document.getElementById('comment')?.scrollIntoView({behavior:'smooth'}),50)">Comment ça marche</a></li>
     <li id="navMesEvents" style="display:none;"><a href="#mes-events" class="nav-mes-events" onclick="event.preventDefault();showMesEvents()"><i class="fa-solid fa-star" style="font-size:11px;"></i> Mes events</a></li>
+    <li id="navAdmin" style="display:none;"><a href="#" onclick="event.preventDefault();showAdmin()" style="color:#E53935;font-weight:700;"><i class="fa-solid fa-shield-halved" style="font-size:11px;"></i> Admin</a></li>
   </ul>
   <div id="navLoggedOut" class="nav-cta">
     <button onclick="openAuthModal('connexion')" class="btn btn-primary" style="padding:10px 22px;font-size:13px;gap:8px;">
@@ -3141,6 +3162,7 @@
   <a href="#explorer" class="mobile-link" onclick="mobileMenu.classList.remove('open');document.body.style.overflow='';showExplorer()">Voir événements</a>
   <a href="#comment" class="mobile-link" onclick="mobileMenu.classList.remove('open');document.body.style.overflow='';showView('home');setTimeout(()=>document.getElementById('comment')?.scrollIntoView({behavior:'smooth'}),50)">Comment ça marche</a>
   <a href="#mes-events" class="mobile-link" id="mobileMesEvents" style="display:none;" onclick="mobileMenu.classList.remove('open');document.body.style.overflow='';showMesEvents()">⭐ Mes events</a>
+  <a href="#" class="mobile-link" id="mobileAdmin" style="display:none;color:#E53935;font-weight:700;" onclick="mobileMenu.classList.remove('open');document.body.style.overflow='';showAdmin()">🛡️ Admin</a>
   <button onclick="tryCreateEvent()" class="btn btn-primary btn-large" style="margin-top:16px;"><i class="fa-solid fa-plus"></i> Créer un événement</button>
 </div>
 
@@ -5828,6 +5850,8 @@
 
     const navMes = document.getElementById('navMesEvents')
     const mobMes = document.getElementById('mobileMesEvents')
+    const navAdm = document.getElementById('navAdmin')
+    const mobAdm = document.getElementById('mobileAdmin')
     if (session && session.user) {
       out.style.display = 'none'
       inn.style.display = 'flex'
@@ -5837,6 +5861,8 @@
       if (ctaIn)   ctaIn.style.display   = 'flex'
       if (navMes)  navMes.style.display  = 'list-item'
       if (mobMes)  mobMes.style.display  = 'block'
+      if (navAdm)  navAdm.style.display  = window._isAdmin ? 'list-item' : 'none'
+      if (mobAdm)  mobAdm.style.display  = window._isAdmin ? 'block' : 'none'
 
       const meta = session.user.user_metadata || {}
       const fullName = meta.full_name || meta.name || ''
@@ -5866,6 +5892,8 @@
       if (ctaIn)   ctaIn.style.display   = 'none'
       if (navMes)  navMes.style.display  = 'none'
       if (mobMes)  mobMes.style.display  = 'none'
+      if (navAdm)  navAdm.style.display  = 'none'
+      if (mobAdm)  mobAdm.style.display  = 'none'
     }
   }
 
@@ -5918,18 +5946,115 @@
     showToast('✅ Profil complété !')
   }
 
+  // ---- Admin ----
+  window._isAdmin = false
+
+  function showAdmin() {
+    if (!window._isAdmin) { alert('Accès refusé.'); return }
+    document.getElementById('adminOverlay').classList.add('open')
+    loadAdminPanel()
+  }
+  function closeAdmin() {
+    document.getElementById('adminOverlay').classList.remove('open')
+  }
+  function switchAdminTab(tab) {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab))
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.toggle('active', s.id === 'adminSec-' + tab))
+  }
+
+  async function loadAdminPanel() {
+    const box = document.getElementById('adminContent')
+    box.innerHTML = '<div class="admin-empty">Chargement…</div>'
+
+    const [{ data: events }, { data: profiles }, { data: banned }] = await Promise.all([
+      supabase.from('events').select('id,titre,activite,date_heure,creator_id').order('created_at', { ascending: false }),
+      supabase.from('profiles').select('id,prenom,nom,ville,type'),
+      supabase.from('banned_users').select('user_id,raison'),
+    ])
+
+    const bannedIds = new Set((banned || []).map(b => b.user_id))
+    const bannedMap = {}
+    ;(banned || []).forEach(b => { bannedMap[b.user_id] = b.raison })
+
+    const evRows = (events || []).map(ev => {
+      const d = ev.date_heure ? new Date(ev.date_heure).toLocaleDateString('fr-FR') : '—'
+      return `<div class="admin-row">
+        <div class="admin-row-info">
+          <div class="admin-row-name">${esc(ev.titre)}</div>
+          <div class="admin-row-sub">${esc(ev.activite)} · ${d}</div>
+        </div>
+        <button class="btn-admin-del" onclick="adminDeleteEvent('${ev.id}')">Supprimer</button>
+      </div>`
+    }).join('') || '<div class="admin-empty">Aucun événement.</div>'
+
+    const userRows = (profiles || []).map(p => {
+      const name = [p.prenom, p.nom].filter(Boolean).join(' ') || '(sans nom)'
+      const isBanned = bannedIds.has(p.id)
+      const badge = isBanned ? `<span class="banned-badge">BANNI</span>` : ''
+      const btn = isBanned
+        ? `<button class="btn-admin-unban" onclick="adminUnbanUser('${p.id}')">Débannir</button>`
+        : `<button class="btn-admin-ban" onclick="adminBanUser('${p.id}','${esc(name)}')">Bannir</button>`
+      return `<div class="admin-row">
+        <div class="admin-row-info">
+          <div class="admin-row-name">${esc(name)}${badge}</div>
+          <div class="admin-row-sub">${p.ville ? esc(p.ville) + ' · ' : ''}${p.type || ''}</div>
+        </div>
+        ${btn}
+      </div>`
+    }).join('') || '<div class="admin-empty">Aucun profil.</div>'
+
+    box.innerHTML = `
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="events" onclick="switchAdminTab('events')">Événements (${(events||[]).length})</button>
+        <button class="admin-tab" data-tab="users" onclick="switchAdminTab('users')">Utilisateurs (${(profiles||[]).length})</button>
+      </div>
+      <div class="admin-section active" id="adminSec-events">${evRows}</div>
+      <div class="admin-section" id="adminSec-users">${userRows}</div>`
+  }
+
+  async function adminDeleteEvent(eventId) {
+    if (!confirm('Supprimer cet événement définitivement ?')) return
+    const { error } = await supabase.from('events').delete().eq('id', eventId)
+    if (error) { alert('Erreur : ' + error.message); return }
+    loadAdminPanel(); loadHomeEvents(); loadExplorer()
+  }
+
+  async function adminBanUser(userId, name) {
+    const raison = prompt(`Raison du bannissement de ${name} :`, 'Violation des CGU')
+    if (raison === null) return
+    const { error } = await supabase.from('banned_users').upsert({ user_id: userId, raison: raison || 'Violation des CGU', banned_by: _currentUserId }, { onConflict: 'user_id' })
+    if (error) { alert('Erreur : ' + error.message); return }
+    loadAdminPanel()
+  }
+
+  async function adminUnbanUser(userId) {
+    if (!confirm('Débannir cet utilisateur ?')) return
+    await supabase.from('banned_users').delete().eq('user_id', userId)
+    loadAdminPanel()
+  }
+
   // ---- Écouter les changements d'état auth ----
   supabase.auth.onAuthStateChange(async (event, session) => {
     _currentUserId = session?.user?.id || null
+    window._isAdmin = session?.user?.app_metadata?.role === 'admin'
     updateNavUI(session)
 
     if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-      // Charger les events immédiatement, sans attendre les opérations de profil
       loadHomeEvents()
       loadExplorer()
 
       if (!session?.user) return
       const user = session.user
+
+      // Vérifier si banni (silencieux si table absente)
+      try {
+        const { data: banData } = await supabase.from('banned_users').select('raison').eq('user_id', user.id).maybeSingle()
+        if (banData) {
+          await supabase.auth.signOut()
+          alert('Ton compte a été suspendu : ' + (banData.raison || 'Violation des CGU'))
+          return
+        }
+      } catch(e) { /* table absente ou erreur non critique */ }
 
       // Opérations de profil en arrière-plan (ne bloquent pas l'affichage)
       const pendingKey = 'pendingProfile_' + user.id
@@ -6109,6 +6234,17 @@
       ? parseInt(participants, 10)
       : null
 
+    // Limite 3 events futurs actifs
+    const { count: activeCount } = await supabase
+      .from('events')
+      .select('id', { count: 'exact', head: true })
+      .eq('creator_id', session.user.id)
+      .gte('date_heure', new Date().toISOString())
+    if (activeCount >= 3) {
+      alert('Limite atteinte : tu as déjà 3 événements futurs actifs. Attends qu\'un event soit passé pour en créer un nouveau.')
+      return
+    }
+
     const { error } = await supabase.from('events').insert({
       creator_id: session.user.id,
       titre: title,
@@ -6145,6 +6281,17 @@
       </div>`
   }
 </script>
+
+<!-- ===================== ADMIN PANEL ===================== -->
+<div class="admin-overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
+  <div class="admin-box">
+    <div class="admin-header">
+      <div class="admin-title"><i class="fa-solid fa-shield-halved" style="color:#E53935;margin-right:8px;"></i>Panel Admin</div>
+      <button onclick="closeAdmin()" style="background:var(--dark3);border:none;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--white);">×</button>
+    </div>
+    <div id="adminContent"><div class="admin-empty">Chargement…</div></div>
+  </div>
+</div>
 
 <!-- MODAL AVATAR PICKER -->
 <div class="avatar-modal-overlay" id="avatarModalOverlay" onclick="if(event.target===this)closeAvatarPicker()">
