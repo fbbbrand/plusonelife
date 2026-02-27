@@ -93,6 +93,7 @@
   nav.scrolled .nav-links a:hover { color: #fff; }
   nav.scrolled .nav-mes-events { color: var(--orange) !important; }
   nav.scrolled .hamburger span { background: #fff; }
+  nav.scrolled #navPrenom { color: #fff; }
 
   .logo {
     display: flex;
@@ -2043,7 +2044,7 @@
   /* ===================== SPORTS MARQUEE ===================== */
   .sports-strip-outer {
     overflow: hidden;
-    padding: 20px 0;
+    padding: 28px 0;
     background: var(--dark);
     border-top: 1px solid rgba(26,23,20,0.06);
     border-bottom: 1px solid rgba(26,23,20,0.06);
@@ -3034,7 +3035,7 @@
 <!-- ===================== NAV ===================== -->
 <nav id="mainNav">
   <a href="#" class="logo" onclick="event.preventDefault();showView('home')">
-    <img src="logo.png" alt="+1life" class="logo-img">
+    <img src="logonoir.png" alt="+1life" class="logo-img" id="navLogo">
   </a>
   <ul class="nav-links">
     <li><a href="#explorer" onclick="event.preventDefault();showExplorer()">Voir événements</a></li>
@@ -5068,8 +5069,11 @@
 
   // ---- NAV scroll ----
   const nav = document.getElementById('mainNav');
+  const navLogo = document.getElementById('navLogo');
   window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 40);
+    const scrolled = window.scrollY > 40;
+    nav.classList.toggle('scrolled', scrolled);
+    if (navLogo) navLogo.src = scrolled ? 'logo.png' : 'logonoir.png';
   });
 
   // ---- Mobile menu ----
