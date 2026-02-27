@@ -8,7 +8,8 @@
       "WebFetch(domain:images.unsplash.com)",
       "Bash(echo no pillow:*)",
       "Bash(python3:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(cd C:\\\\Users\\\\fetti\\\\Desktop\\\\deadbull:*)"
     ]
   }
 }

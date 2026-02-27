@@ -1282,6 +1282,33 @@
     .hero-ctas .btn { width: 100%; justify-content: center; }
   }
 
+  /* ===================== TOAST ===================== */
+  #toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #FFFFFF;
+    color: var(--white);
+    border: 1.5px solid rgba(192,104,48,0.35);
+    border-left: 4px solid #C06830;
+    border-radius: 12px;
+    padding: 14px 22px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 9999;
+    white-space: nowrap;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+
   /* ===================== MODALS ===================== */
   .modal-overlay {
     position: fixed;
@@ -3025,7 +3052,7 @@
   <a href="#explorer" class="mobile-link" onclick="mobileMenu.classList.remove('open');document.body.style.overflow='';showExplorer()">Voir événements</a>
   <a href="#comment" class="mobile-link" onclick="mobileMenu.classList.remove('open');document.body.style.overflow='';showView('home');setTimeout(()=>document.getElementById('comment')?.scrollIntoView({behavior:'smooth'}),50)">Comment ça marche</a>
   <a href="#mes-events" class="mobile-link" id="mobileMesEvents" style="display:none;" onclick="mobileMenu.classList.remove('open');document.body.style.overflow='';showMesEvents()">⭐ Mes events</a>
-  <button onclick="openModal('modalEvent')" class="btn btn-primary btn-large" style="margin-top:16px;"><i class="fa-solid fa-plus"></i> Créer un événement</button>
+  <button onclick="tryCreateEvent()" class="btn btn-primary btn-large" style="margin-top:16px;"><i class="fa-solid fa-plus"></i> Créer un événement</button>
 </div>
 
 <!-- ===================== VIEW HOME ===================== -->
@@ -3046,7 +3073,7 @@
 <h1>Ton lieu.<br><span class="accent">Ton heure.</span><br>Ton rythme.</h1>
     <p class="hero-sub">Sportif, en rééducation, senior ou simplement isolé — crée ou rejoins une activité près de chez toi. Gratuit, sans engagement, ouvert à tous.</p>
     <div id="heroCtaLoggedOut" class="hero-ctas">
-      <button onclick="openModal('modalEvent')" class="btn btn-primary btn-large"><i class="fa-solid fa-plus"></i> Je crée un événement</button>
+      <button onclick="tryCreateEvent()" class="btn btn-primary btn-large"><i class="fa-solid fa-plus"></i> Je crée un événement</button>
       <button onclick="openAuthModal('connexion')" class="btn btn-outline btn-large"><i class="fa-solid fa-right-to-bracket"></i> Connexion</button>
     </div>
     <div id="heroCtaLoggedIn" class="hero-ctas" style="display:none;">
@@ -3482,7 +3509,7 @@
     <p>Rejoins la communauté sportive bretonne. Crée un compte en 10 secondes, ton premier event en 2 minutes.</p>
     <div id="ctaLoggedOut" class="cta-buttons">
       <button onclick="openAuthModal('connexion')" class="btn btn-primary btn-large"><i class="fa-solid fa-right-to-bracket"></i> Connexion</button>
-      <button onclick="openModal('modalEvent')" class="btn btn-outline btn-large"><i class="fa-solid fa-plus"></i> Créer un événement</button>
+      <button onclick="tryCreateEvent()" class="btn btn-outline btn-large"><i class="fa-solid fa-plus"></i> Créer un événement</button>
     </div>
     <div id="ctaLoggedIn" class="cta-buttons" style="display:none;">
       <button onclick="openModal('modalEvent')" class="btn btn-primary btn-large"><i class="fa-solid fa-plus"></i> Créer un événement</button>
@@ -5062,6 +5089,24 @@
     });
   });
 
+  // ===================== TOAST =====================
+  let _toastTimer
+  function showToast(msg) {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.classList.add('show')
+    clearTimeout(_toastTimer)
+    _toastTimer = setTimeout(() => t.classList.remove('show'), 3500)
+  }
+
+  function tryCreateEvent() {
+    if (!_currentUserId) {
+      showToast('👤 Crée un compte pour publier un événement')
+      return
+    }
+    openModal('modalEvent')
+  }
+
   // ===================== MODALS =====================
   function openModal(id, preselect) {
     const overlay = document.getElementById(id);
@@ -5725,6 +5770,8 @@
     </div>
   </div>
 </div>
+
+<div id="toast"></div>
 
 </body>
 </html>

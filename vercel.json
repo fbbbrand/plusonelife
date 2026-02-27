@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "builds": [{ "src": "index.html", "use": "@vercel/static" }],
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
+    {
+      "source": "/mosaique/(.*)\\.jfif",
+      "headers": [{ "key": "Content-Type", "value": "image/jpeg" }]
+    },
     {
       "source": "/(.*)",
       "headers": [
